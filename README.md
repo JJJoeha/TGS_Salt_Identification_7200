@@ -1,2 +1,3 @@
 # TGS_Salt_Identification_7200
-This is a project on TGS Salt Identification competition on Kaggle. Created by Minda Chen and Yuxuan Xiong.
+This is a Salt Identification project for Course 7200Scala. 
+Created by Minda Chen and Yuxuan Xiong.
