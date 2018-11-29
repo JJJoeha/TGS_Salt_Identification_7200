@@ -1,4 +1,3 @@
-import org.apache.spark.mllib.linalg.DenseMatrix
 import scala.util.Try
 
 
