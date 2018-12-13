@@ -1,23 +1,17 @@
 import java.io.File
 import java.util.Random
 
+import org.apache.log4j.{BasicConfigurator, Logger}
 import org.datavec.api.io.filters.BalancedPathFilter
 import org.datavec.api.io.labels.ParentPathLabelGenerator
 import org.datavec.api.split.FileSplit
 import org.datavec.image.loader.NativeImageLoader
 import org.datavec.image.recordreader.ImageRecordReader
-import org.datavec.image.transform.{FlipImageTransform, ImageTransform, ResizeImageTransform, WarpImageTransform}
+import org.datavec.image.transform.{ImageTransform, PipelineImageTransform, ResizeImageTransform, ShowImageTransform}
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator
-import org.deeplearning4j.eval.Evaluation
-import org.deeplearning4j.optimize.listeners.ScoreIterationListener
 import org.deeplearning4j.util.ModelSerializer
 import org.nd4j.linalg.dataset.DataSet
-//import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.linalg.dataset.api.preprocessor.{DataNormalization, ImagePreProcessingScaler}
-import org.apache.log4j.Logger
-import org.apache.log4j.BasicConfigurator;
-
-import scala.collection.JavaConverters._
 
 object load_model_test extends App{
 
@@ -73,9 +67,6 @@ class load_model_test {
     //  val warpTransform: ImageTransform = new WarpImageTransform(rng1,42)
     //  val transPipe = List[ImageTransform](resizeTransform, flipTransform1,flipTransform2,warpTransform).asJava
 
-    import org.datavec.image.transform.PipelineImageTransform
-    import org.datavec.image.transform.MultiImageTransform
-    import org.datavec.image.transform.ShowImageTransform
     val showBefore: ImageTransform = new ShowImageTransform("Display - before ")
 
     val transPipe :ImageTransform = new PipelineImageTransform(resizeTransform, showBefore)
