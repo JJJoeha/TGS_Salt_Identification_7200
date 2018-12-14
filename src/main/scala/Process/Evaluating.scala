@@ -14,14 +14,14 @@ object Evaluating extends App{
 
   val mainPath:String = System.getProperty("user.dir")
 
-  val height:Int=96
-  val width:Int=96
+  val height:Int=101
+  val width:Int=101
   val channels:Int=1
   val seed:Long=12345
   val splitRate:Double=0.7
   val batchSize:Int=16
 
-  val modelSavePath:String=mainPath+"/saved_model/bestGraph.bin"
+  val modelSavePath:String=mainPath+"/saved_model/UNET_RES.zip"
   val net : ComputationGraph = ModelUtils.loadModel(modelSavePath,"cg").left.get
 
   val dataSetPath:String=mainPath+"/Dataset/train"

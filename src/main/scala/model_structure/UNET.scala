@@ -163,7 +163,7 @@ object UNET {
 
       .addLayer("conv10", new ConvolutionLayer.Builder(3, 3).stride(1, 1).nOut(1)
         .convolutionMode(ConvolutionMode.Same).activation(Activation.SIGMOID).build, "conv9-3")
-      .addLayer("output", new CnnLossLayer.Builder(LossFunctions.LossFunction.MCXENT).activation(Activation.SOFTMAX).build(), "conv10")
+      .addLayer("output", new CnnLossLayer.Builder(LossFunctions.LossFunction.XENT).build(), "conv10")
 
       .setOutputs("output")
 
