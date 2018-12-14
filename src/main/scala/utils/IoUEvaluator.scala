@@ -27,7 +27,7 @@ case class IoUEvaluator(ys :Seq[INDArray],
   // calculate average IoU for all INDArrays
   def eval(): Option[Double] = Try(pairs) match {
     case Success(pairs:Seq[(INDArray,INDArray)]) => {
-      // create an Seq[Option[Double]], flatten it and calculate average
+      // create an Seq[Option[Double]], flatten it and calculate average IoU
       // use option to simply drop those INDArrays that throw exceptions during evaluation
       val os:Seq[Double]= pairs.flatMap(x => Try(eval(x._1, x._2)) match {
           case Success(v) => Some(v)

@@ -1,4 +1,4 @@
-package training_process
+package Process
 
 import java.io.File
 
@@ -55,22 +55,22 @@ object UNET_RES_TRAIN_SPARK{
         case Failure(_)=>None
       }
     }
-//
-//    val mainPath: Option[String] = getArgs(args,0)
-//    val epochs: Option[Int] = getArgs(args,1)
-//    val batchSize: Option[Int] = getArgs(args,2)
-//    val trainMonitorLog: Option[String] = getArgs(args,3)
-//    val modelSavingPath: Option[String] = getArgs(args,4)
 
-    val mainPath: String = "Dataset"
-    val epochs: Option[Int] = Some(5)
-    val batchSize:  Option[Int] = Some(16)
-    val trainMonitorLog: Option[String] = Some("")
-    val modelSavingPath: Option[String] = Some("/saved_model")
+    val mainPath: Option[String] = getArgs(args,0)
+    val epochs: Option[Int] = getArgs(args,1)
+    val batchSize: Option[Int] = getArgs(args,2)
+    val trainMonitorLog: Option[String] = getArgs(args,3)
+    val modelSavingPath: Option[String] = getArgs(args,4)
+
+//    val mainPath: String = "Dataset"
+//    val epochs: Option[Int] = Some(5)
+//    val batchSize:  Option[Int] = Some(16)
+//    val trainMonitorLog: Option[String] = Some("")
+//    val modelSavingPath: Option[String] = Some("/saved_model")
 
 
-    val imgDir = mainPath + "/train/images/"
-    val maskDir = mainPath + "/train/masks/"
+    val imgDir = mainPath.getOrElse("") + "/train/images/"
+    val maskDir = mainPath.getOrElse("") + "/train/masks/"
 
     val unet: UNET_RES = UNET_RES(seed, channels, height, width)
     val model = Try(unet.init_model)

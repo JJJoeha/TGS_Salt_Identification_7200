@@ -47,7 +47,6 @@ object UNET_RES {
   private val updater = new AdaDelta
   private val cacheMode = CacheMode.NONE
   private val workspaceMode = WorkspaceMode.ENABLED
-  private val cudnnAlgoMode = ConvolutionLayer.AlgoMode.PREFER_FASTEST
 
   def graphBuilder(seed:Long) : ComputationGraphConfiguration.GraphBuilder = {
 
