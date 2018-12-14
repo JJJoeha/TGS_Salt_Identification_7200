@@ -31,13 +31,13 @@ object Retrain extends App{
   val batchSize:Int=16
   val epochs:Int=5
 
-  val modelSavePath:String=mainPath+"/saved_model/model_Structure/UNET.zip"
+  val modelSavePath:String=mainPath+"/saved_model/UNET.zip"
   val net : ComputationGraph = ModelUtils.loadModel(modelSavePath,"cg").left.get
 
   val dataSetPath:String=mainPath+"/Dataset/train"
 
   val dsLoader = DataSetLoader(dataSetPath,height,width,channels,batchSize,splitRate, seed)
-  val dsi = dsLoader.getTrainIter()
+  val dsi = dsLoader.getTrainIter(1)
 
   val uiServer = UIServer.getInstance
   val statsStorage = new InMemoryStatsStorage
@@ -47,7 +47,7 @@ object Retrain extends App{
   val esconf:EarlyStoppingConfiguration[ComputationGraph] = new EarlyStoppingConfiguration.Builder[ComputationGraph]
     .epochTerminationConditions(new MaxEpochsTerminationCondition(epochs))
     .iterationTerminationConditions(new MaxTimeIterationTerminationCondition(20, TimeUnit.MINUTES))
-    .scoreCalculator(new DataSetLossCalculator(dsLoader.getTestIter, true))
+    .scoreCalculator(new DataSetLossCalculator(dsLoader.getTestIter(1), true))
     .evaluateEveryNEpochs(1)
     .modelSaver(new LocalFileGraphSaver(modelSavePath))
     .build

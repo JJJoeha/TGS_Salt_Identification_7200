@@ -23,17 +23,19 @@ case class DataSetLoader(dataSetPath:String,
 
   val log : Logger = Logger.getLogger(this.getClass)
   BasicConfigurator.configure()
+
   val imgPath: File = new File(dataSetPath, "images")
   val maskPath: File = new File(dataSetPath, "masks")
   val imgNum: Int = Option(imgPath.list).map(_.count(_.endsWith(".png"))).getOrElse(0)
   val maskNum: Int = Option(maskPath.list).map(_.count(_.endsWith(".png"))).getOrElse(0)
+  val rng:Random=new Random(seed)
 
   if (imgNum != maskNum) throw new RuntimeException("Number of images and masks do not match! ")
 
   log.info(s"$imgNum images and masks found.")
 
-  val imgSplit = new FileSplit(imgPath, NativeImageLoader.ALLOWED_FORMATS, new Random(seed))
-  val maskSplit = new FileSplit(maskPath, NativeImageLoader.ALLOWED_FORMATS, new Random(seed))
+  val imgSplit = new FileSplit(imgPath, NativeImageLoader.ALLOWED_FORMATS, rng)
+  val maskSplit = new FileSplit(maskPath, NativeImageLoader.ALLOWED_FORMATS, rng)
 
   val imgReader: ImageRecordReader = new ImageRecordReader(height, width, channels)
   val maskReader: ImageRecordReader = new ImageRecordReader(height, width, channels)
@@ -57,11 +59,11 @@ case class DataSetLoader(dataSetPath:String,
   def getTrainData():DataSet=splits.getTrain
   def getTestData():DataSet=splits.getTest
 
-  def getTrainIter():DataSetIterator={
-    new AsyncDataSetIterator(new SamplingDataSetIterator(getTrainData(), batchSize, imgNum))
+  def getTrainIter(proportion:Double):DataSetIterator={
+    new AsyncDataSetIterator(new SamplingDataSetIterator(getTrainData(), batchSize, (imgNum*proportion).toInt))
   }
-  def getTestIter():DataSetIterator={
-    new AsyncDataSetIterator(new SamplingDataSetIterator(getTestData(), batchSize, imgNum))
+  def getTestIter(proportion:Double):DataSetIterator={
+    new AsyncDataSetIterator(new SamplingDataSetIterator(getTestData(), batchSize, (imgNum*proportion).toInt))
   }
 
 

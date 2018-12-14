@@ -36,12 +36,12 @@ object Training extends App {
   val network : UNET = UNET(seed,channels,height,width)
 
   val dataSetPath:String=mainPath+"/Dataset/train"
-  val modelSavePath:String=mainPath+s"/saved_model/UNET.zip"
+  val modelSavePath:String=mainPath+s"/saved_model/unet_t2"
   val preSavedDataSetPath:String=mainPath+"/Dataset/presaved"
   val testImgPath:String=mainPath+"/src/test/resources/TestDataSet/presaved"
 
   val dsLoader = DataSetLoader(dataSetPath,height,width,channels,batchSize,splitRate, seed)
-  val dsi = dsLoader.getTrainIter
+  val dsi = dsLoader.getTrainIter(1)
 
   val net = network.init_model
   log.info("Printing network summary...")
@@ -56,20 +56,16 @@ object Training extends App {
 
   val esconf:EarlyStoppingConfiguration[ComputationGraph] = new EarlyStoppingConfiguration.Builder[ComputationGraph]
     .epochTerminationConditions(new MaxEpochsTerminationCondition(epochs))
-    .iterationTerminationConditions(new MaxTimeIterationTerminationCondition(20, TimeUnit.MINUTES))
-    .scoreCalculator(new DataSetLossCalculator(dsLoader.getTestIter, true))
+    .iterationTerminationConditions(new MaxTimeIterationTerminationCondition(2, TimeUnit.HOURS))
+    .scoreCalculator(new DataSetLossCalculator(dsLoader.getTestIter(0.1), true))
     .evaluateEveryNEpochs(1)
     .modelSaver(new LocalFileGraphSaver(modelSavePath))
     .build
 
   val trainer  = new EarlyStoppingGraphTrainer(esconf, net, dsi)
 
+  trainer.fit()
 
-  log.info(s"Start training...")
-  for(i<-1 to epochs){
-    log.info(s"Epoch $i, Time:${Calendar.getInstance.getTime}")
-    trainer.fit()
-  }
-
+  ModelUtils.saveModel(net, modelSavePath+"/Manually-saved-UNET.zip",true)
 
 }
