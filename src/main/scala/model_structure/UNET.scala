@@ -42,7 +42,6 @@ object UNET {
   private val weightInit:WeightInit = WeightInit.RELU
   private val initFilterNum = 16
   private val updater = new AdaDelta
-  private val cacheMode = CacheMode.NONE
   private val workspaceMode = WorkspaceMode.ENABLED
   private val cudnnAlgoMode = ConvolutionLayer.AlgoMode.PREFER_FASTEST
 
@@ -56,7 +55,6 @@ object UNET {
       .updater(updater)
       .l2(5e-5)
       .miniBatch(true)
-      .cacheMode(cacheMode)
       .trainingWorkspaceMode(workspaceMode)
       .inferenceWorkspaceMode(workspaceMode)
       .graphBuilder()
@@ -100,10 +98,10 @@ object UNET {
       .addLayer("pool4", new SubsamplingLayer.Builder(SubsamplingLayer.PoolingType.MAX).kernelSize(2, 2)
         .build(), "drop4")
 
-      .addLayer("conv5-1", new ConvolutionLayer.Builder(3, 3).stride(1, 1).nOut(1024)
+      .addLayer("conv5-1", new ConvolutionLayer.Builder(3, 3).stride(1, 1).nOut(initFilterNum*16)
         .convolutionMode(ConvolutionMode.Same)
         .activation(Activation.RELU).build(), "pool4")
-      .addLayer("conv5-2", new ConvolutionLayer.Builder(3, 3).stride(1, 1).nOut(1024)
+      .addLayer("conv5-2", new ConvolutionLayer.Builder(3, 3).stride(1, 1).nOut(initFilterNum*16)
         .convolutionMode(ConvolutionMode.Same)
         .activation(Activation.RELU).build(), "conv5-1")
       .addLayer("drop5", new DropoutLayer.Builder(0.5).build(), "conv5-2")
@@ -122,8 +120,7 @@ object UNET {
         .activation(Activation.RELU).build(), "conv6-1")
 
       // up7
-      .addLayer("up7-1", new Deconvolution2D.Builder(3,3).stride(2,2).nOut(initFilterNum*4)
-        .convolutionMode(ConvolutionMode.Truncate).build(), "conv6-2")
+      .addLayer("up7-1",new Upsampling2D.Builder(2).build(), "conv6-2")
       .addLayer("up7-2", new ConvolutionLayer.Builder(2, 2).stride(1, 1).nOut(initFilterNum*4)
         .convolutionMode(ConvolutionMode.Same)
         .activation(Activation.RELU).build(), "up7-1")
@@ -149,8 +146,7 @@ object UNET {
         .activation(Activation.RELU).build(), "conv8-1")
 
       // up9
-      .addLayer("up9-1", new Deconvolution2D.Builder(3,3).stride(2,2).nOut(initFilterNum*4)
-      .convolutionMode(ConvolutionMode.Truncate).build(), "conv8-2")
+      .addLayer("up9-1",new Upsampling2D.Builder(2).build(), "conv8-2")
       .addLayer("up9-2", new ConvolutionLayer.Builder(2, 2).stride(1, 1).nOut(initFilterNum)
         .convolutionMode(ConvolutionMode.Same)
         .activation(Activation.RELU).build(), "up9-1")

@@ -1,12 +1,15 @@
 package utils
 
 import org.apache.log4j.{BasicConfigurator, Logger}
+import org.deeplearning4j.earlystopping.scorecalc.{DataSetLossCalculator, ScoreCalculator}
+import org.deeplearning4j.earlystopping.scorecalc.base.BaseScoreCalculator
+import org.deeplearning4j.nn.api.Model
 import org.nd4j.linalg.api.ndarray.INDArray
 
 import scala.util.{Failure, Success, Try}
 
 case class IoUEvaluator(ys :Seq[INDArray],
-                        y_hats :Seq[INDArray]) {
+                        y_hats :Seq[INDArray]){
 
   //logger
   val log: Logger = Logger.getLogger(this.getClass)
@@ -31,7 +34,7 @@ case class IoUEvaluator(ys :Seq[INDArray],
       // use option to simply drop those INDArrays that throw exceptions during evaluation
       val os:Seq[Double]= pairs.flatMap(x => Try(eval(x._1, x._2)) match {
           case Success(v) => Some(v)
-          case Failure(e) => log.info(s"Fail to eval Arrays at index ${pairs.indexOf(x)}", e); None
+          case Failure(_) => log.info(s"Fail to eval Arrays at index ${pairs.indexOf(x)}, skipping it"); None
       })
       Some(os.sum/os.length)
     }

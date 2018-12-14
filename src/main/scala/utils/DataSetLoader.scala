@@ -8,8 +8,8 @@ import org.datavec.api.split.FileSplit
 import org.datavec.image.loader.NativeImageLoader
 import org.datavec.image.recordreader.ImageRecordReader
 import org.deeplearning4j.datasets.datavec.RecordReaderDataSetIterator
-import org.deeplearning4j.datasets.iterator.{ExistingDataSetIterator, SamplingDataSetIterator}
-import org.nd4j.linalg.dataset.{DataSet, ExistingMiniBatchDataSetIterator}
+import org.deeplearning4j.datasets.iterator.{AsyncDataSetIterator, SamplingDataSetIterator}
+import org.nd4j.linalg.dataset.DataSet
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
 import org.nd4j.linalg.dataset.api.preprocessor.{DataNormalization, ImagePreProcessingScaler}
 
@@ -18,6 +18,7 @@ case class DataSetLoader(dataSetPath:String,
                          width:Int,
                          channels:Int,
                          batchSize:Int,
+                         splitRate:Double,
                          seed:Long) {
 
   val log : Logger = Logger.getLogger(this.getClass)
@@ -39,19 +40,34 @@ case class DataSetLoader(dataSetPath:String,
 
   imgReader.initialize(imgSplit)
   maskReader.initialize(maskSplit)
+
   val scaler: DataNormalization = new ImagePreProcessingScaler(0, 1)
   val imgIter:DataSetIterator = new RecordReaderDataSetIterator.Builder(imgReader,batchSize).preProcessor(scaler).build
   val maskIter:DataSetIterator = new RecordReaderDataSetIterator.Builder(maskReader,batchSize).build
 
   lazy val dataset:DataSet = new DataSet(imgIter.next(imgNum).getFeatures, maskIter.next(maskNum).getFeatures.div(65535))
+  val splits=dataset.splitTestAndTrain(splitRate)
+
 
   def load():DataSet = {
     log.info("Loading dataset...")
     dataset
   }
 
+  def getTrainData():DataSet=splits.getTrain
+  def getTestData():DataSet=splits.getTest
+
+  def getTrainIter():DataSetIterator={
+    new AsyncDataSetIterator(new SamplingDataSetIterator(getTrainData(), batchSize, imgNum))
+  }
+  def getTestIter():DataSetIterator={
+    new AsyncDataSetIterator(new SamplingDataSetIterator(getTestData(), batchSize, imgNum))
+  }
+
+
   def getImgIter():DataSetIterator = imgIter
   def getMaskIter():DataSetIterator = maskIter
+
   def preSaveDataset(saveTo:String)={
     log.info("Saving dataset...")
     val di:DataSetIterator = new SamplingDataSetIterator(dataset, batchSize, imgNum/2)
@@ -62,6 +78,7 @@ case class DataSetLoader(dataSetPath:String,
     }
     log.info(s"Dataset saved to $saveTo...")
   }
+
 
 
 }

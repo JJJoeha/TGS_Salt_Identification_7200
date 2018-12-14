@@ -1,8 +1,11 @@
 package utils
 
 import java.io.File
+
 import org.apache.log4j.{BasicConfigurator, Logger}
 import org.deeplearning4j.nn.api.Model
+import org.deeplearning4j.nn.graph.ComputationGraph
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
 import org.deeplearning4j.util.ModelSerializer
 
 object ModelUtils {
@@ -22,16 +25,12 @@ object ModelUtils {
     }
   }
 
-  def loadModel(modelPath:String, modelType:String): Model = {
+  def loadModel(modelPath:String, modelType:String): Either[ComputationGraph,MultiLayerNetwork] = {
     log.info("Loading model...")
     modelType.toLowerCase match {
-      case "cg" => ModelSerializer.restoreComputationGraph(modelPath);
-      case "mn" => ModelSerializer.restoreMultiLayerNetwork(modelPath)
+      case "cg" => Left(ModelSerializer.restoreComputationGraph(modelPath))
+      case "mn" => Right(ModelSerializer.restoreMultiLayerNetwork(modelPath))
     }
   }
-
-//  def calculateIoU(model:Model, testImgPath:String):Option[Double] = {
-//      val dataImport:DataImport = DataImport(testImgPath,)
-//  }
 
 }

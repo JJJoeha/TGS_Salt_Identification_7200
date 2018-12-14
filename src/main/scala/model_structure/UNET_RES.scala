@@ -267,8 +267,7 @@ object UNET_RES {
     //The upSampling blocks indexes will be reversed to correspond with subSampling blocks
       builder
         //transpose convolution
-        .addLayer(blockName+"_deconv", new Deconvolution2D.Builder(3,3).stride(2,2).nOut(initFilterNum*8)
-          .convolutionMode(ConvolutionMode.Same).build, "middle_res2_BN2")
+        .addLayer(blockName+"_deconv", new Upsampling2D.Builder(2).build(), "middle_res2_BN2")
         //Concatenate
         .addVertex(blockName+"_uconv", new MergeVertex, "up4_deconv", "sub4_res2_BN2")
         //dropout
@@ -308,8 +307,7 @@ object UNET_RES {
     //upSampling block 2,  12->25
     builder
       //transpose convolution
-      .addLayer(blockName+"_deconv", new Deconvolution2D.Builder(3,3).stride(2,2).nOut(initFilterNum*4)
-      .convolutionMode(ConvolutionMode.Truncate).build, "up4_res2_BN2")
+      .addLayer(blockName+"_deconv", new Upsampling2D.Builder(2).build(), "up4_res2_BN2")
       //Concatenate
       .addVertex(blockName+"_uconv", new MergeVertex, "up3_deconv", "sub3_res2_BN2")
       //dropout
@@ -350,8 +348,7 @@ object UNET_RES {
     //upSampling block 3,  25->50
     builder
       //transpose convolution
-      .addLayer(blockName+"_deconv", new Deconvolution2D.Builder(3,3).stride(2,2).nOut(initFilterNum*2)
-      .convolutionMode(ConvolutionMode.Same).build, "up3_res2_BN2")
+      .addLayer(blockName+"_deconv", new Upsampling2D.Builder(2).build(), "up3_res2_BN2")
       //Concatenate
       .addVertex(blockName+"_uconv", new MergeVertex, "up2_deconv", "sub2_res2_BN2")
       //dropout
@@ -391,8 +388,7 @@ object UNET_RES {
     //upSampling block 4, 50->101
     builder
       //transpose convolution
-      .addLayer(blockName+"_deconv", new Deconvolution2D.Builder(3,3).stride(2,2).nOut(initFilterNum)
-      .convolutionMode(ConvolutionMode.Truncate).build, "up2_res2_BN2")
+      .addLayer(blockName+"_deconv", new Upsampling2D.Builder(2).build(), "up2_res2_BN2")
       //Concatenate
       .addVertex(blockName+"_uconv", new MergeVertex, "up1_deconv", "sub1_res2_BN2")
       //dropout

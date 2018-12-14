@@ -5,7 +5,7 @@ import utils.DataSetLoader
 
 object PreSaveDataSet extends App{
 
-  protected val log : Logger = Logger.getLogger(UNET_RES_TRAIN.getClass)
+  protected val log : Logger = Logger.getLogger(Training.getClass)
   BasicConfigurator.configure()
 
   val mainPath:String = System.getProperty("user.dir")
@@ -21,7 +21,7 @@ object PreSaveDataSet extends App{
   val dataSetPath:String=mainPath+"/Dataset/train"
   val preSavedDataSetPath:String=mainPath+"/Dataset/presaved"
 
-  val dsLoader = DataSetLoader(dataSetPath,height,width,channels,batchSize, seed)
+  val dsLoader = DataSetLoader(dataSetPath,height,width,channels,batchSize,splitRate, seed)
   dsLoader.preSaveDataset(preSavedDataSetPath)
 
 }
